@@ -1,0 +1,106 @@
+INCLUDE EMU8086.INC
+.MODEL SMALL
+.STACK 100H
+.DATA
+
+SUBSTR1 DB 50 DUP(0)
+MAINSTR DB 50 DUP(0)
+LEN_MAIN DW 0H
+LEN_SUB DW 0H
+START DW 0H
+STOP DW 0H
+.CODE
+
+MAIN PROC
+
+    MOV AX,@DATA
+    MOV DS,AX
+    MOV ES,AX
+
+    PRINT 'ENTER THE STRING: ' 
+    
+    XOR SI,SI
+    MOV AH,1
+    INPUT_MAIN_STR:
+        INT 21H
+        CMP AL,0DH
+        JE EXIT_FROM_INPUT_MAIN_STR
+        MOV MAINSTR[SI],AL
+        INC SI
+    JMP INPUT_MAIN_STR
+    EXIT_FROM_INPUT_MAIN_STR:
+
+    MOV LEN_MAIN, SI
+
+  
+    PRINTN ''
+    PRINT 'ENTER SUB STRING: '
+    
+    XOR SI,SI
+    MOV AH,1
+    INPUT_SUBSTR:
+        INT 21H
+        CMP AL,0DH
+        JE EXIT_FROM_INPUT_SUBSTR
+        MOV SUBSTR1[SI],AL
+        INC SI
+    JMP INPUT_SUBSTR
+    EXIT_FROM_INPUT_SUBSTR:
+    
+    MOV LEN_SUB,SI
+
+    CMP LEN_MAIN,0 
+    JE PRINT_NO_MSG
+
+    CMP LEN_SUB,0 
+    JE PRINT_NO_MSG
+    MOV BX,LEN_SUB 
+    CMP LEN_MAIN, BX
+    JL PRINT_NO_MSG
+    
+    ;INITIALIZE SI,DI
+    LEA DI,MAINSTR 
+    MOV START,DI 
+    LEA SI,SUBSTR1
+    CLD 
+
+    MOV STOP,DI 
+    MOV BX,LEN_MAIN
+    ADD STOP,BX
+    MOV CX,LEN_SUB
+    SUB STOP,CX
+    
+    TRAVERSE_MAINSTR:
+        MOV DI,START 
+        MOV CX,LEN_SUB
+        LEA SI,SUBSTR1 
+
+        REPE CMPSB
+        JE PRINT_YES_MSG
+        
+        INC START
+        
+        MOV AX,START
+        CMP AX,STOP
+        JG PRINT_NO_MSG
+
+    JMP TRAVERSE_MAINSTR
+
+    PRINT_YES_MSG:
+  
+        PRINTN ''
+        PRINT 'IT IS A SUB STRING.'
+        JMP EXITL
+
+    PRINT_NO_MSG:
+         
+        PRINTN ''
+        PRINT 'IT IS NOT SUB STRING.'  
+        
+    EXITL:
+
+    MOV AH,4CH
+    INT 21H 
+MAIN ENDP
+
+END MAIN
