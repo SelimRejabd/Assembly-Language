@@ -1,0 +1,45 @@
+include emu8086.inc
+.MODEL SMALL
+.STACK 100H
+.DATA
+
+LARGEST_NUM DB 0H
+
+.CODE
+MAIN PROC
+
+    MOV AX,@DATA
+    MOV DS,AX
+    MOV ES,AX
+
+    PRINT 'INPUT'
+    
+
+    MOV AH,1
+    XOR SI,SI
+    INPUT:
+        INT 21H
+        CMP AL,0DH
+        JE EXIT_FROM_INPUT
+        ; MOV ARRAY[SI]
+        CMP AL,LARGEST_NUM
+        JLE SKIP
+        MOV LARGEST_NUM,AL
+        SKIP:
+        INC SI
+    JMP INPUT
+    EXIT_FROM_INPUT:
+ 
+    PRINTN ''
+     PRINT 'LARGEST NUMBER: '
+
+    MOV AH,2
+    MOV DL,LARGEST_NUM
+    INT 21H
+
+    ;DOS EXIT
+    MOV AH,4CH
+    INT 21H
+
+MAIN ENDP
+END MAIN
