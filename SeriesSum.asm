@@ -6,7 +6,7 @@ INCLUDE EMU8086.INC
     SUM DB 0D
     DIVIDEND DB 2D
 .CODE
-;description
+;Input must be 1-3
 MAIN PROC
     MOV AX,@DATA
     MOV DS,AX
